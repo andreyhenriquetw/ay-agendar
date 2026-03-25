@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FcGoogle } from "react-icons/fc";
 
 const loginSchema = z.object({
   email: z
@@ -48,7 +49,7 @@ const LoginForm = () => {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
     await authClient.signIn.email(
       {
         email: values.email,
@@ -63,12 +64,18 @@ const LoginForm = () => {
         },
       },
     );
-  }
-
+  };
+  const handleGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+      scopes: ["profile", "email"],
+    });
+  };
   return (
     <Card>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>Faça login para continuar.</CardDescription>
@@ -108,7 +115,7 @@ const LoginForm = () => {
               )}
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-2">
             <Button
               type="submit"
               className="w-full"
@@ -119,6 +126,16 @@ const LoginForm = () => {
               ) : (
                 "Entrar"
               )}
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex w-full items-center gap-2"
+              type="button"
+              onClick={handleGoogleLogin}
+            >
+              <FcGoogle />
+              Entrar com o Google
             </Button>
           </CardFooter>
         </form>
